@@ -6,7 +6,20 @@
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["gta", "mobile-game", "threejs", "webgl", "open-world", "hindi", "english"],
+  "keywords": [
+    "gta",
+    "mobile-game",
+    "threejs",
+    "webgl",
+    "open-world",
+    "hindi",
+    "english"
+  ],
   "author": "Antigravity",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  }
 }
