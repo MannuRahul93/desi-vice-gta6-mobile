@@ -1,0 +1,10 @@
+{
+  "name": "Desi Vice: Mobile (GTA 6 Style)",
+  "short_name": "DesiVice",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#06b6d4",
+  "description": "Open world mobile action game with low-configuration optimization and Hindi/English localization"
+}

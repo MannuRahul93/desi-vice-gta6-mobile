@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Desi Vice: Mobile - Open World Action</title>
+  
+  <!-- Mobile Web App & PWA Settings -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#06b6d4">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 3D Canvas Container -->
+  <div id="canvas-container"></div>
+  
+  <!-- Touch Camera Look Swipe Zone (Right Screen Half) -->
+  <div id="touch-camera-zone"></div>
+  
+  <!-- Interactive Mobile HUD Overlay -->
+  <div id="ui-overlay">
+    
+    <!-- Top Left: GPS Radar & Mission Tracker -->
+    <div class="top-left-hud">
+      <div class="radar-wrapper">
+        <canvas id="radar-canvas" width="110" height="110"></canvas>
+      </div>
+      
+      <div id="mission-card" class="mission-card">
+        <div id="mission-title" class="mission-title" data-i18n="mission1Title">Mission 1: The Vice Arrival</div>
+        <div id="mission-desc" class="mission-desc" data-i18n="mission1Step1">Find and steal the Supercar marked yellow on your radar.</div>
+        <div id="mission-timer" class="mission-timer" style="display:none;"></div>
+      </div>
+    </div>
+    
+    <!-- Top Right: Wanted Level, Cash, Health, Settings, Language Switch -->
+    <div class="top-right-hud">
+      <div class="hud-row-top">
+        <div id="wanted-stars" class="wanted-stars">
+          <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+        </div>
+        <div id="hud-cash-val" class="cash-display">₹2,500</div>
+      </div>
+      
+      <div class="hud-bars">
+        <div class="bar-wrap">
+          <div id="hud-hp-bar" class="bar-fill hp-fill"></div>
+        </div>
+        <div class="bar-wrap">
+          <div id="hud-armor-bar" class="bar-fill armor-fill"></div>
+        </div>
+      </div>
+      
+      <div class="hud-actions">
+        <button id="btn-lang-toggle" class="hud-btn">🇮🇳 हिंदी</button>
+        <button id="btn-settings-open" class="hud-btn" data-i18n="settings">SETTINGS</button>
+      </div>
+    </div>
+    
+    <!-- Speedometer & Nitro Boost (Visible while driving) -->
+    <div id="speedo-container" class="speedo-container">
+      <div id="speedo-value" class="speedo-value">0</div>
+      <div class="speedo-unit" data-i18n="speedUnit">KM/H</div>
+      <div class="nitro-bar-wrap">
+        <div id="nitro-fill" class="nitro-fill"></div>
+      </div>
+    </div>
+    
+    <!-- Bottom Left: Virtual Analog Joystick -->
+    <div id="joystick-zone" class="joystick-zone">
+      <div id="joystick-nub" class="joystick-nub"></div>
+    </div>
+    
+    <!-- Bottom Right: Tactile Touch Action Buttons -->
+    <div class="action-buttons-zone">
+      <!-- Upper Utility Row -->
+      <div class="action-row">
+        <button id="btn-cam-switch" class="touch-btn" title="Camera">
+          <span class="icon">📷</span>
+          <span class="label" data-i18n="btnCam">CAM</span>
+        </button>
+        <button id="btn-radio" class="touch-btn" title="Radio">
+          <span class="icon">📻</span>
+          <span class="label" data-i18n="btnRadio">RADIO</span>
+        </button>
+        <button id="btn-horn" class="touch-btn" title="Horn">
+          <span class="icon">📢</span>
+          <span class="label" data-i18n="btnHorn">HORN</span>
+        </button>
+      </div>
+      
+      <!-- Primary Action Row -->
+      <div class="action-row">
+        <button id="btn-jump" class="touch-btn" title="Jump / Handbrake">
+          <span class="icon">🦘</span>
+          <span class="label" data-i18n="btnJump">JUMP</span>
+        </button>
+        
+        <button id="btn-sprint" class="touch-btn" title="Sprint / Nitro">
+          <span class="icon">⚡</span>
+          <span class="label" data-i18n="btnSprint">SPRINT</span>
+        </button>
+        
+        <button id="btn-punch" class="touch-btn" title="Punch / Attack">
+          <span class="icon">👊</span>
+          <span class="label" data-i18n="btnPunch">PUNCH</span>
+        </button>
+        
+        <button id="btn-drive" class="touch-btn primary-action" title="Enter / Exit Car">
+          <span class="icon">🚗</span>
+          <span id="lbl-drive-btn" class="label" data-i18n="btnDrive">DRIVE</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mission Complete / Fail Pop-Up Banner -->
+    <div id="mission-banner" class="mission-banner"></div>
+  </div>
+  
+  <!-- Settings & Quality Modal -->
+  <div id="modal-settings" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="settings">SETTINGS / सेटिंग्स</div>
+        <button id="btn-settings-close" class="modal-close">&times;</button>
+      </div>
+      
+      <div class="settings-section">
+        <div class="settings-label" data-i18n="graphicsQuality">GRAPHICS PRESET / ग्राफ़िक्स</div>
+        <div class="quality-options">
+          <button id="opt-quality-low" class="quality-btn" data-i18n="qualityLow">LOW (60 FPS)</button>
+          <button id="opt-quality-med" class="quality-btn active" data-i18n="qualityMed">MEDIUM</button>
+          <button id="opt-quality-high" class="quality-btn" data-i18n="qualityHigh">ULTRA HD</button>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <div class="settings-label">PC CONTROLS / कीबोर्ड कंट्रोल्स</div>
+        <div class="pc-controls-guide">
+          <strong>W, A, S, D / Arrows:</strong> Move / Drive (चलें / गाड़ी चलाएं)<br>
+          <strong>Shift:</strong> Sprint / Nitro (दौड़ें / नाइट्रो)<br>
+          <strong>Space:</strong> Jump / Drift (कूदें / ड्रिफ्ट)<br>
+          <strong>F / Enter:</strong> Enter / Exit Vehicle (गाड़ी में बैठें / उतरें)<br>
+          <strong>E:</strong> Punch Attack (मुक्का)<br>
+          <strong>H:</strong> Car Horn (हॉर्न) | <strong>R:</strong> Radio (रेडियो)
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Game Scripts -->
+  <script src="js/three.min.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="js/city.js"></script>
+  <script src="js/police.js"></script>
+  <script src="js/traffic.js"></script>
+  <script src="js/missions.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

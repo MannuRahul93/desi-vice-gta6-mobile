@@ -1,0 +1,12 @@
+{
+  "name": "gta-mobile-game",
+  "version": "1.0.0",
+  "description": "GTA 6 style open-world 3D mobile game optimized for low-end smartphones with Hindi & English support",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["gta", "mobile-game", "threejs", "webgl", "open-world", "hindi", "english"],
+  "author": "Antigravity",
+  "license": "MIT"
+}
