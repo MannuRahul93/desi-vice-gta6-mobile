@@ -24,16 +24,24 @@ class MissionManager {
     const group = new THREE.Group();
     
     // Outer floating cylinder beacon
-    const cylGeo = new THREE.CylinderGeometry(2.5, 2.5, 0.4, 24);
-    const cylMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.7 });
+    const cylGeo = new THREE.CylinderGeometry(3.0, 3.0, 0.45, 24);
+    const cylMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.75 });
     const cyl = new THREE.Mesh(cylGeo, cylMat);
     group.add(cyl);
     
+    // Glowing diamond crest
+    const diamond = new THREE.Mesh(
+      new THREE.OctahedronGeometry(1.2, 0),
+      new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+    );
+    diamond.position.y = 3.5;
+    group.add(diamond);
+    
     // Vertical beam of light
-    const beamGeo = new THREE.CylinderGeometry(0.3, 0.3, 40, 12);
+    const beamGeo = new THREE.CylinderGeometry(0.35, 0.35, 60, 12);
     const beamMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.4 });
     const beam = new THREE.Mesh(beamGeo, beamMat);
-    beam.position.y = 20;
+    beam.position.y = 30;
     group.add(beam);
     
     this.markerMesh = group;
@@ -49,7 +57,6 @@ class MissionManager {
     if (id === 1) {
       // Mission 1: Steal the Supercar and deliver to safehouse
       this.timer = 90;
-      this.targetPoint = this.city.safehouseLocation.clone();
       
       // Spawn mission car at Central Plaza (20, 0, 30)
       this.targetVehicle = new Vehicle(this.scene, 'supercar', new THREE.Vector3(20, 0, 30));
@@ -75,9 +82,11 @@ class MissionManager {
   
   setMarker(pos) {
     if (pos) {
+      this.targetPoint = pos.clone();
       this.markerMesh.position.copy(pos);
       this.markerMesh.visible = true;
     } else {
+      this.targetPoint = null;
       this.markerMesh.visible = false;
     }
   }
@@ -85,16 +94,15 @@ class MissionManager {
   update(delta, playerPos, playerInVehicle) {
     if (this.isCompleted) return;
     
-    // Animate marker spin & pulse
+    // Animate marker spin & bob
     if (this.markerMesh.visible) {
-      this.markerMesh.rotation.y += delta * 2.0;
-      this.markerMesh.position.y = Math.sin(Date.now() / 300) * 0.3;
+      this.markerMesh.rotation.y += delta * 2.2;
+      this.markerMesh.position.y = Math.sin(Date.now() / 250) * 0.35;
     }
     
     // Mission 1 Logic
     if (this.activeMissionId === 1) {
       if (this.stage === 1) {
-        // Check if player entered the target supercar
         if (playerInVehicle && this.player.currentVehicle === this.targetVehicle) {
           this.stage = 2;
           this.setMarker(this.city.safehouseLocation);
@@ -105,9 +113,8 @@ class MissionManager {
         this.timer -= delta;
         this.updateTimerHUD(Math.ceil(this.timer));
         
-        // Check distance to safehouse docks
         const dist = playerPos.distanceTo(this.city.safehouseLocation);
-        if (dist < 12.0) {
+        if (dist < 14.0) {
           this.completeMission(5000);
         } else if (this.timer <= 0) {
           this.failMission();
@@ -126,7 +133,7 @@ class MissionManager {
     else if (this.activeMissionId === 3) {
       const rampLoc = this.city.ramps[0].pos;
       const distToRamp = playerPos.distanceTo(new THREE.Vector3(rampLoc.x, 0, rampLoc.z));
-      if (playerInVehicle && distToRamp < 15 && this.player.currentVehicle.getSpeedKmh() > 95) {
+      if (playerInVehicle && distToRamp < 16 && this.player.currentVehicle.getSpeedKmh() > 95) {
         this.completeMission(12000);
       }
     }
@@ -149,10 +156,9 @@ class MissionManager {
     
     AudioSys.speak(`${I18N.t('missionPassed')} +₹${rewardCash}`, I18N.currentLang);
     
-    // Advance to next mission after 5 seconds
     setTimeout(() => {
       let nextId = this.activeMissionId + 1;
-      if (nextId > 3) nextId = 1; // Loop or free roam
+      if (nextId > 3) nextId = 1;
       this.startMission(nextId);
     }, 5000);
   }

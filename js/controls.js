@@ -152,8 +152,16 @@ class InputController {
     
     stickNub.style.transform = `translate(${dx}px, ${dy}px)`;
     
-    // Normalized move vector: X is steer/strafe, Y is forward/reverse
-    this.moveVector.set(dx / this.stickRadius, -dy / this.stickRadius);
+    // Deadzone check & smooth analog curve
+    const normalizedDist = Math.min(1.0, distance / this.stickRadius);
+    if (normalizedDist < 0.08) {
+      this.moveVector.set(0, 0);
+    } else {
+      const factor = (normalizedDist - 0.08) / (1.0 - 0.08);
+      const dirX = dx / Math.max(1, distance);
+      const dirY = dy / Math.max(1, distance);
+      this.moveVector.set(dirX * factor, -dirY * factor);
+    }
   }
   
   bindTouchButton(elementId, callback) {
